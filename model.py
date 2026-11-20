@@ -15,11 +15,11 @@ b = -592.2797174702706
 
 st.title("Predict the orbital period by the Asteroid Features")
 
-estDiaKMMin = st.slider("Enter the minimum estimated diameter of the asteroid (km): ", 0, 15.6)
-estDiaKMMax = st.slider("Enter the maximum estimated diameter of the asteroid (km): ", 0, 34.8)
-missDist = st.slider("Enter the miss distance of the asteroid (AU): ", 0, 0.5)
-minOrbitInter = st.slider("Enter the minimum orbit intersection distance (AU): ", 0, 0.48)
-eccentricity = st.slider("Enter the oebit's eccentricity: ", 0, 0.48)
+estDiaKMMin = st.slider("Enter the minimum estimated diameter of the asteroid (km): ", 0.0, 15.6)
+estDiaKMMax = st.slider("Enter the maximum estimated diameter of the asteroid (km): ", 0.0, 34.8)
+missDist = st.slider("Enter the miss distance of the asteroid (AU): ", 0.0, 0.5)
+minOrbitInter = st.slider("Enter the minimum orbit intersection distance (AU): ", 0.0, 0.48)
+eccentricity = st.slider("Enter the oebit's eccentricity: ", 0.0, 0.48)
 perihelionDist = st.slider("Enter the Perihelion distance of the asteroid (AU):", 0.18, 1.3)
 aphelionDist = st.slider("Enter the Aphelion distance of the asteroid (AU):", 2.01, 8.98)
 meanMotion = st.slider("Enter the asteroid's mean motion: ", 0.09, 2.04)
