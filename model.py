@@ -10,16 +10,14 @@ CONST_X = 5
 VERTICAL_DIST_MIN = 2.01 - 0.18
 VERTICAL_DIST_MAX = 8.98 - 0.18
 WIDTH_TO_HEIGHT_RATIO = 0.6
-W = np.array([-3610782303.5985737, 1614790935.5551405, 6.93764541298151, 14.44410478323698, -154.9549529403448, 332.2918645106256, 436.8382604122162, 198.17179575562477])
+W = np.array([6.93764541298151, 14.44410478323698, -154.9549529403448, 332.2918645106256, 436.8382604122162, 198.17179575562477])
 b = -592.2797174702706
 
 st.title("Predict the orbital period by the Asteroid Features")
 
-estDiaKMMin = st.slider("Enter the minimum estimated diameter of the asteroid (km): ", 0.0, 15.6)
-estDiaKMMax = st.slider("Enter the maximum estimated diameter of the asteroid (km): ", 0.0, 34.8)
 missDist = st.slider("Enter the miss distance of the asteroid (AU): ", 0.0, 0.5)
 minOrbitInter = st.slider("Enter the minimum orbit intersection distance (AU): ", 0.0, 0.48)
-eccentricity = st.slider("Enter the oebit's eccentricity: ", 0.0, 0.48)
+eccentricity = st.slider("Enter the orbit's eccentricity: ", 0.0, 0.48)
 perihelionDist = st.slider("Enter the Perihelion distance of the asteroid (AU):", 0.18, 1.3)
 aphelionDist = st.slider("Enter the Aphelion distance of the asteroid (AU):", 2.01, 8.98)
 meanMotion = st.slider("Enter the asteroid's mean motion: ", 0.09, 2.04)
@@ -27,7 +25,7 @@ meanMotion = st.slider("Enter the asteroid's mean motion: ", 0.09, 2.04)
 def CalcPrediction(params):
   return params @ W + b
 
-st.success("Minimum estimated diameter: " + str(estDiaKMMin) + "km\n\nMaximum estimated diameter: " + str(estDiaKMMax) + "km\n\nAsteroid's miss distance: " + str(missDist) + "AU\n\nOrbit's minimum intersection distance: " + str(minOrbitInter) + "AU\n\nOrbit's eccentricity: " + str(eccentricity) + "\n\nPerihelion distance: " + str(perihelionDist) + "AU\n\n\nAphelion distance: " + str(aphelionDist) + "AU\n\nMean motion: " + str(meanMotion) + "\n\nThe Orbital period is: " + str(np.round(CalcPrediction(np.array([estDiaKMMin, estDiaKMMax, missDist, minOrbitInter, eccentricity, perihelionDist, aphelionDist, meanMotion])))) + " days")
+st.success("Asteroid's miss distance: " + str(missDist) + "AU\n\nOrbit's minimum intersection distance: " + str(minOrbitInter) + "AU\n\nOrbit's eccentricity: " + str(eccentricity) + "\n\nPerihelion distance: " + str(perihelionDist) + "AU\n\n\nAphelion distance: " + str(aphelionDist) + "AU\n\nMean motion: " + str(meanMotion) + "\n\nThe Orbital period is: " + str(np.round(CalcPrediction(np.array([missDist, minOrbitInter, eccentricity, perihelionDist, aphelionDist, meanMotion])))) + " days")
 
 verticalDist = aphelionDist + perihelionDist + 2 * ORBIT_OBJECT_RADIUS
 maxY = verticalDist + 2
