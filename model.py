@@ -25,7 +25,8 @@ meanMotion = st.slider("Enter the asteroid's mean motion: ", 0.09, 2.04)
 def CalcPrediction(params):
   return params @ W + b
 
-st.success("Asteroid's miss distance: " + str(missDist) + "AU\n\nOrbit's minimum intersection distance: " + str(minOrbitInter) + "AU\n\nOrbit's eccentricity: " + str(eccentricity) + "\n\nPerihelion distance: " + str(perihelionDist) + "AU\n\n\nAphelion distance: " + str(aphelionDist) + "AU\n\nMean motion: " + str(meanMotion) + "\n\nThe Orbital period is: " + str(np.round(CalcPrediction(np.array([missDist, minOrbitInter, eccentricity, perihelionDist, aphelionDist, meanMotion])))) + " days")
+st.info("Asteroid's miss distance: " + str(missDist) + "AU\n\nOrbit's minimum intersection distance: " + str(minOrbitInter) + "AU\n\nOrbit's eccentricity: " + str(eccentricity) + "\n\nPerihelion distance: " + str(perihelionDist) + "AU\n\n\nAphelion distance: " + str(aphelionDist) + "AU\n\nMean motion: " + str(meanMotion))
+st.success("The Orbital period is: " + str(np.round(CalcPrediction(np.array([missDist, minOrbitInter, eccentricity, perihelionDist, aphelionDist, meanMotion])))) + " days")
 
 verticalDist = aphelionDist + perihelionDist + 2 * ORBIT_OBJECT_RADIUS
 maxY = verticalDist + 2
