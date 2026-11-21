@@ -5,58 +5,92 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from matplotlib.patches import Ellipse
 
-ORBIT_OBJECT_RADIUS = 0.35
-CONST_X = 5
-VERTICAL_DIST_MIN = 2.01 - 0.18
-VERTICAL_DIST_MAX = 8.98 - 0.18
-WIDTH_TO_HEIGHT_RATIO = 0.6
+st.set_page_config(layout="wide")
+
+SUN_RADIUS = 0.25
 W = np.array([6.93764541298151, 14.44410478323698, -154.9549529403448, 332.2918645106256, 436.8382604122162, 198.17179575562477])
-b = -592.2797174702706
+bias = -592.2797174702706
 
 st.title("Predict the orbital period by the Asteroid Features")
 
-missDist = st.slider("Enter the miss distance of the asteroid (AU): ", 0.0, 0.5)
-minOrbitInter = st.slider("Enter the minimum orbit intersection distance (AU): ", 0.0, 0.48)
-eccentricity = st.slider("Enter the orbit's eccentricity: ", 0.0, 0.48)
-perihelionDist = st.slider("Enter the Perihelion distance of the asteroid (AU):", 0.18, 1.3)
-aphelionDist = st.slider("Enter the Aphelion distance of the asteroid (AU):", 2.01, 8.98)
-meanMotion = st.slider("Enter the asteroid's mean motion: ", 0.09, 2.04)
-
 def CalcPrediction(params):
-  return params @ W + b
+    return params @ W + bias
 
-st.info("Asteroid's miss distance: " + str(missDist) + "AU\n\nOrbit's minimum intersection distance: " + str(minOrbitInter) + "AU\n\nOrbit's eccentricity: " + str(eccentricity) + "\n\nPerihelion distance: " + str(perihelionDist) + "AU\n\n\nAphelion distance: " + str(aphelionDist) + "AU\n\nMean motion: " + str(meanMotion))
-st.success("The Orbital period is: " + str(np.round(CalcPrediction(np.array([missDist, minOrbitInter, eccentricity, perihelionDist, aphelionDist, meanMotion])))) + " days")
+col_sliders, col_output = st.columns([1.1, 1], gap="large")
 
-verticalDist = aphelionDist + perihelionDist + 2 * ORBIT_OBJECT_RADIUS
-maxY = verticalDist + 2
-constY = maxY - verticalDist + perihelionDist
-yValue = constY + (verticalDist / 2 - ORBIT_OBJECT_RADIUS - perihelionDist)
+with col_sliders:
+    st.subheader("Asteroid Parameters")
+    missDist = st.slider("Enter the miss distance of the asteroid (AU): ", 0.0, 0.5)
+    minOrbitInter = st.slider("Enter the minimum orbit intersection distance (AU): ", 0.0, 0.48)
+    eccentricity = st.slider("Enter the orbit's eccentricity: ", 0.01, 0.96)
+    perihelionDist = st.slider("Enter the Perihelion distance of the asteroid (AU):", 0.33, 1.3)
+    aphelionDist = st.slider("Enter the Aphelion distance of the asteroid (AU):", 2.01, 8.98)
+    meanMotion = st.slider("Enter the asteroid's mean motion: ", 0.09, 2.04)
 
-# Create figure and axes
-fig, ax = plt.subplots()
+with col_output:
+    st.subheader("Summary & Prediction")
+    st.info(
+        f"Asteroid's miss distance: {missDist} AU\n\n"
+        f"Orbit's minimum intersection distance: {minOrbitInter} AU\n\n"
+        f"Orbit's eccentricity: {eccentricity}\n\n"
+        f"Perihelion distance: {perihelionDist} AU\n\n"
+        f"Aphelion distance: {aphelionDist} AU\n\n"
+        f"Mean motion: {meanMotion}"
+    )
 
-# Define ellipse: center (x, y), width, height, angle in degrees
-ellipse = Ellipse(
-    xy=(CONST_X, yValue), width=verticalDist, height=verticalDist * WIDTH_TO_HEIGHT_RATIO, angle=90, edgecolor='gray', facecolor='white'
-)
-ax.add_patch(ellipse)
+    predicted_days = np.round(CalcPrediction(np.array([missDist, minOrbitInter, eccentricity, perihelionDist, aphelionDist, meanMotion])))
+    st.success(f"The Orbital period is: {predicted_days} days")
 
-# 2. Add the Circle: center (x, y), radius
-orbitAround = plt.Circle(
-    xy=(CONST_X, constY), radius=ORBIT_OBJECT_RADIUS, edgecolor='lightblue', facecolor='lightblue', label='Orbit around'
-)
-ax.add_patch(orbitAround)
+    # --- SMALLER ORBIT GRAPH ---
+    a = (aphelionDist + perihelionDist) / 2.0
+    b = a * np.sqrt(1 - eccentricity**2)
+    sun_x, sun_y = 0, 0
+    ellipse_center_y = a - perihelionDist
 
-# Semi-axes lengths
-a = verticalDist / 2  # Semi-vertical axis
-b = (verticalDist * WIDTH_TO_HEIGHT_RATIO) / 2  # Semi-horizontal axis
+    # Smaller figsize (3.5 x 3.5 inches)
+    fig, ax = plt.subplots(figsize=(3.5, 3.5))
 
-# Configure axes
-ax.set_xlim(0, CONST_X * 2)
-ax.set_ylim(0, maxY)
-ax.set_aspect('equal')
-ax.set_title('Asteroid orbit')
-ax.axis('off')
-# Display in Streamlit
-st.pyplot(fig)
+    ellipse = Ellipse(
+        xy=(sun_x, ellipse_center_y),
+        width=2 * a,
+        height=2 * b,
+        angle=90,
+        edgecolor='gray',
+        facecolor='none',
+        linewidth=1.5,
+        label='Asteroid Orbit'
+    )
+    ax.add_patch(ellipse)
+
+    sun = plt.Circle(
+        xy=(sun_x, sun_y),
+        radius=SUN_RADIUS,
+        edgecolor='orange',
+        facecolor='gold',
+        zorder=5,
+        label='Sun'
+    )
+    ax.add_patch(sun)
+
+    earth_orbit = plt.Circle((0, 0), radius=1.0, edgecolor='dodgerblue', facecolor='none', linestyle='--', alpha=0.5, label='Earth (1 AU)')
+    ax.add_patch(earth_orbit)
+
+    if missDist > 0:
+        miss_circle = plt.Circle((1.0, 0), radius=missDist, edgecolor='red', facecolor='red', alpha=0.2, label='Miss Zone')
+        ax.add_patch(miss_circle)
+
+    ax.plot(0, -perihelionDist, 'go', markersize=4, label=f'Perihelion ({perihelionDist})')
+    ax.plot(0, aphelionDist, 'ro', markersize=4, label=f'Aphelion ({aphelionDist})')
+
+    max_extent = max(aphelionDist, 1.5) + 1.0
+    ax.set_xlim(-max_extent, max_extent)
+    ax.set_ylim(-perihelionDist - 1.5, aphelionDist + 1.0)
+    ax.set_aspect('equal')
+    ax.set_title('Asteroid Orbit (AU)', fontsize=10)
+    ax.tick_params(labelsize=7)
+    ax.legend(loc='upper right', fontsize=6.5)
+    ax.grid(True, linestyle=':', alpha=0.4)
+    ax.axis("off")
+    
+    # use_container_width=False prevents Streamlit from stretching the small figure
+    st.pyplot(fig, use_container_width=False)
